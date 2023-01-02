@@ -33,6 +33,10 @@
 
 cmake_minimum_required(VERSION 3.21)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 project(test_mypartio)
 
 file(GLOB io_cpp "io/*.cpp")
@@ -89,6 +93,10 @@ option(TEST_MYPARTIO "test my partio" ON)
 if(TEST_MYPARTIO)
 
     enable_testing()
+
+    file(GLOB data_files "${CMAKE_CURRENT_SOURCE_DIR}/tests/data/*")
+    message(STATUS "Copying data_files: ${data_files}")
+
     # 方便增加测试用例的函数，只要用addtest(name)即可
     function(addtest testname)
         add_executable(test_${testname} tests/test_${testname}.cpp)
@@ -96,20 +104,16 @@ if(TEST_MYPARTIO)
         target_link_libraries(test_${testname} mypartio)
         add_test(NAME test_${testname} COMMAND test_${testname})
 
-        file(GLOB data_files "${CMAKE_CURRENT_SOURCE_DIR}/tests/data/*")
         add_custom_command(TARGET test_${testname} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${data_files}
             $<TARGET_FILE_DIR:test_${testname}>)
 
-    endfunction(addtest)
-
-    #在这里增加测试
-    addtest(mypartio)
-    addtest(iterator)
-
-    # add_executable(test_mypartio test_mypartio.cpp)
-    # target_compile_definitions(test_mypartio PRIVATE  PARTIO_USE_ZLIB)
-    # target_link_libraries(test_mypartio mypartio )
-
+      endfunction(addtest)
+          
+      #在这里增加测试
+      addtest(mypartio)
+      addtest(iterator)
+      addtest(heapdata)
+      
 endif()
